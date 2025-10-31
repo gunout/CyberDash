@@ -5,7 +5,8 @@ Beatstreet Cyberdash - Lecteur de fichiers - ( http:// )
 <img width="1280" height="1024" alt="Screenshot_2025-10-31_18-32-01" src="https://github.com/user-attachments/assets/824673db-695b-4d76-97a6-17f9486e5031" />
 <img width="1280" height="1024" alt="Screenshot_2025-10-31_18-32-18" src="https://github.com/user-attachments/assets/8651ac34-0cf4-483f-a3fe-83405a420a08" />
 
-PS : UTILISER L'EXTENSIONS ( ADD-ONS ) WEBROWSER - FEARCH POUR TROUVER DES LIENS : http:// 
+# RECOMMANDATIONS 
+    PS : UTILISER L'EXTENSIONS ( ADD-ONS ) WEBROWSER - FEARCH POUR TROUVER DES LIENS : http:// 
 
 # LIENS - FEARCH :
 https://addons.mozilla.org/en-US/firefox/addon/fearchit/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search
