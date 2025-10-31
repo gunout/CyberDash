@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEATSTREET CYBERDASH - Multimedia System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-cyan: #00ffff;
+            --secondary-cyan: #00cccc;
+            --dark-cyan: #0088aa;
+            --accent-blue: #0099ff;
+            --bg-dark: #0a0a0f;
+            --bg-darker: #050508;
+            --bg-panel: rgba(0, 20, 30, 0.8);
+            --text-primary: #00ffff;
+            --text-secondary: #00cccc;
+            --glow-cyan: 0 0 20px rgba(0, 255, 255, 0.8);
+            --glow-blue: 0 0 15px rgba(0, 153, 255, 0.6);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #050508 50%, #0a0a1a 100%);
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-cyan);
+            border-radius: 50%;
+            box-shadow: var(--glow-cyan);
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Grid overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 2;
+            animation: grid-move 10s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Main dashboard container */
+        .dashboard {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-panel);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--glow-cyan), inset 0 0 30px rgba(0, 255, 255, 0.1);
+            animation: header-glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes header-glow {
+            0% { box-shadow: var(--glow-cyan), inset 0 0 30px rgba(0, 255, 255, 0.1); }
+            100% { box-shadow: var(--glow-blue), inset 0 0 40px rgba(0, 153, 255, 0.2); }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(20px, 4vw, 32px);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: linear-gradient(45deg, var(--primary-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--glow-cyan);
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: var(--glow-cyan); }
+            25% { text-shadow: -2px 0 var(--accent-blue), 2px 0 var(--primary-cyan); }
+            50% { text-shadow: 2px 0 var(--accent-blue), -2px 0 var(--primary-cyan); }
+            75% { text-shadow: 0 0 20px var(--primary-cyan); }
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: clamp(10px, 2vw, 14px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-cyan);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+
+        /* Main content area */
+        .main-content {
+            display: grid;
+            grid-template-columns: minmax(250px, 350px) 2fr minmax(200px, 300px);
+            gap: 20px;
+            min-height: 500px;
+        }
+
+        /* Left panel - Playlist */
+        .left-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--glow-cyan);
+            display: flex;
+            flex-direction: column;
+            animation: slide-in-left 0.8s ease-out;
+            min-width: 250px;
+            max-width: 350px;
+        }
+
+        @keyframes slide-in-left {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(14px, 3vw, 18px);
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary-cyan);
+            text-align: center;
+        }
+
+        .playlist-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 10px;
+            max-height: 500px;
+            min-height: 200px;
+        }
+
+        .playlist-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .playlist-container::-webkit-scrollbar-track {
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .playlist-container::-webkit-scrollbar-thumb {
+            background: var(--primary-cyan);
+            border-radius: 3px;
+        }
+
+        .playlist-item {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 60px;
+        }
+
+        .playlist-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .playlist-item:hover::before {
+            left: 100%;
+        }
+
+        .playlist-item:hover {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: var(--primary-cyan);
+            transform: translateX(5px);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .playlist-item.active {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: var(--primary-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .track-name-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .track-name {
+            font-size: clamp(10px, 2vw, 12px);
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            line-height: 1.3;
+        }
+
+        .track-type {
+            font-size: clamp(8px, 1.5vw, 10px);
+            padding: 2px 6px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .track-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: flex-end;
+        }
+
+        .download-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: clamp(8px, 1.5vw, 10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .download-btn:hover {
+            background: var(--primary-cyan);
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+            transform: scale(1.05);
+        }
+
+        /* Center panel - Browser */
+        .center-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--glow-cyan);
+            display: flex;
+            flex-direction: column;
+            animation: slide-in-up 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slide-in-up {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .browser-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #0c0c0d;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .browser-header {
+            background: #2a2a2e;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .browser-controls {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+
+        .browser-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .browser-btn.close {
+            background: #ff5f57;
+        }
+
+        .browser-btn.minimize {
+            background: #ffbd2e;
+        }
+
+        .browser-btn.maximize {
+            background: #28ca42;
+        }
+
+        .browser-url-bar {
+            flex: 1;
+            display: flex;
+            background: #42414d;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .browser-url-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+            color: #fbfbfe;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+        }
+
+        .browser-url-bar input:focus {
+            outline: none;
+        }
+
+        .go-btn {
+            background: #0060df;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .go-btn:hover {
+            background: #0250bb;
+        }
+
+        .scan-url-btn {
+            background: #00a2ff;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
+            transition: background 0.3s;
+            margin-left: 5px;
+        }
+
+        .scan-url-btn:hover {
+            background: #0088cc;
+        }
+
+        .browser-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .web-browser {
+            flex: 1;
+            background: white;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Video player */
+        .video-player {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .video-player.active {
+            display: block;
+        }
+
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+
+        /* Book reader */
+        .book-reader {
+            width: 100%;
+            height: 400px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            color: #f0f0f0;
+            font-family: 'Rajdhani', sans-serif;
+            display: none;
+        }
+
+        .book-reader.active {
+            display: block;
+        }
+
+        .book-reader h2 {
+            color: var(--primary-cyan);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .book-content {
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* Media Player */
+        .media-player {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--glow-cyan);
+            z-index: 100;
+        }
+
+        .media-player.active {
+            display: block;
+        }
+
+        .media-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            color: var(--primary-cyan);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .media-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .media-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .media-btn:hover {
+            background: var(--primary-cyan);
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .media-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .media-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--accent-blue));
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .close-media {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: var(--primary-cyan);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* Right panel - Controls */
+        .right-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--glow-cyan);
+            display: flex;
+            flex-direction: column;
+            animation: slide-in-right 0.8s ease-out;
+        }
+
+        @keyframes slide-in-right {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .control-btn:hover {
+            background: var(--primary-cyan);
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+            transform: scale(1.1);
+        }
+
+        .control-btn.play-pause {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--accent-blue));
+            width: 0%;
+            transition: width 0.1s linear;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: clamp(10px, 2vw, 12px);
+            color: var(--text-secondary);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 6px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--primary-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-cyan);
+            border: none;
+        }
+
+        .download-all-btn {
+            background: linear-gradient(45deg, var(--primary-cyan), var(--accent-blue));
+            border: none;
+            color: var(--bg-dark);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: clamp(12px, 2.5vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: auto;
+        }
+
+        .download-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Bottom control panel */
+        .bottom-controls {
+            background: var(--bg-panel);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 15px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--glow-cyan);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            animation: slide-in-up 1s ease-out;
+        }
+
+        .bottom-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(10px, 2vw, 12px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bottom-btn:hover {
+            background: var(--primary-cyan);
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* File scanner overlay */
+        .scanner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .scanner-container {
+            background: var(--bg-panel);
+            border: 2px solid var(--primary-cyan);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: var(--glow-cyan);
+            animation: scanner-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scanner-pulse {
+            0%, 100% { box-shadow: var(--glow-cyan); }
+            50% { box-shadow: var(--glow-blue), 0 0 40px rgba(0, 255, 255, 0.5); }
+        }
+
+        .scanner-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--primary-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .scanner-status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: clamp(12px, 2.5vw, 14px);
+            color: var(--text-secondary);
+        }
+
+        .scanner-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .scanner-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--accent-blue));
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .file-input-label {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-cyan), var(--accent-blue));
+            color: var(--bg-dark);
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(12px, 2.5vw, 14px);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.5);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .manual-scan {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .path-input {
+            flex: 1;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            padding: 10px;
+            border-radius: 10px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(12px, 2vw, 14px);
+        }
+
+        .path-input::placeholder {
+            color: rgba(0, 255, 255, 0.5);
+        }
+
+        .scan-btn {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(12px, 2vw, 14px);
+            transition: all 0.3s ease;
+        }
+
+        .scan-btn:hover {
+            background: var(--primary-cyan);
+            color: var(--bg-dark);
+            box-shadow: var(--glow-cyan);
+        }
+
+        /* Notification system */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-panel);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 10px;
+            padding: 15px 20px;
+            box-shadow: var(--glow-cyan);
+            z-index: 2000;
+            animation: slide-in-right 0.5s ease-out;
+            max-width: 300px;
+        }
+
+        .notification.success {
+            border-color: #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        .notification.error {
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .notification-title {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .notification-message {
+            font-size: clamp(10px, 2vw, 12px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+
+            .left-panel, .right-panel {
+                max-height: 300px;
+                max-width: none;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .status-bar {
+                justify-content: center;
+            }
+
+            .bottom-controls {
+                gap: 10px;
+            }
+
+            .bottom-btn {
+                padding: 8px 15px;
+                font-size: clamp(8px, 2vw, 10px);
+            }
+
+            .browser-content {
+                flex-direction: column;
+            }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="cyber-bg" id="cyberBg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Main dashboard -->
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">Beatstreet Cyberdash</div>
+                <div class="status-bar">
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span>System Online</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span id="trackCount">0 Files</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span id="playerStatus">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Left panel - Playlist -->
+            <section class="left-panel">
+                <h2 class="panel-title">Playlist</h2>
+                <div class="playlist-container" id="playlistContainer">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                        No files in playlist
+                    </div>
+                </div>
+                <button class="download-all-btn" id="downloadAllBtn">
+                    Download All Files
+                </button>
+            </section>
+
+            <!-- Center panel - Browser -->
+            <section class="center-panel">
+                <div class="browser-container">
+                    <div class="browser-header">
+                        <div class="browser-controls">
+                            <div class="browser-btn close"></div>
+                            <div class="browser-btn minimize"></div>
+                            <div class="browser-btn maximize"></div>
+                        </div>
+                        <div class="browser-url-bar">
+                            <input type="text" id="urlInput" placeholder="Enter URL or search...">
+                            <button class="go-btn" id="goBtn">Go</button>
+                            <button class="scan-url-btn" id="scanUrlBtn">Scan URL</button>
+                        </div>
+                    </div>
+                    <div class="browser-content">
+                        <iframe class="web-browser" id="webBrowser" src="about:blank"></iframe>
+                    </div>
+                </div>
+                
+                <!-- Video Player -->
+                <div class="video-player" id="videoPlayer">
+                    <video id="videoElement" controls>
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <!-- Book Reader -->
+                <div class="book-reader" id="bookReader">
+                    <h2 id="bookTitle">Book Title</h2>
+                    <div class="book-content" id="bookContent">
+                        <!-- Book content will be displayed here -->
+                    </div>
+                </div>
+                
+                <!-- Media Player -->
+                <div class="media-player" id="mediaPlayer">
+                    <button class="close-media" id="closeMedia">✕</button>
+                    <div class="media-title" id="mediaTitle">Now Playing</div>
+                    <div class="media-controls">
+                        <button class="media-btn" id="mediaPrev">⏮</button>
+                        <button class="media-btn" id="mediaPlayPause">▶</button>
+                        <button class="media-btn" id="mediaNext">⏭</button>
+                    </div>
+                    <div class="media-progress" id="mediaProgress">
+                        <div class="media-progress-bar" id="mediaProgressBar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right panel - Controls -->
+            <section class="right-panel">
+                <h2 class="panel-title">Controls</h2>
+                <div class="music-controls">
+                    <button class="control-btn" id="prevBtn">⏮</button>
+                    <button class="control-btn play-pause" id="playPauseBtn">▶</button>
+                    <button class="control-btn" id="nextBtn">⏭</button>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                </div>
+                <div class="volume-control">
+                    <span>🔊</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+                    <span id="volumeValue">80%</span>
+                </div>
+                <div style="margin-top: auto; text-align: center;">
+                    <div style="font-size: clamp(10px, 2vw, 12px); color: var(--text-secondary); margin-bottom: 10px;">
+                        Player Controls
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button class="bottom-btn" id="toggleVideo" style="padding: 8px 15px; font-size: clamp(8px, 1.5vw, 10px);">
+                            Video
+                        </button>
+                        <button class="bottom-btn" id="toggleBook" style="padding: 8px 15px; font-size: clamp(8px, 1.5vw, 10px);">
+                            Book
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom controls -->
+        <footer class="bottom-controls">
+            <button class="bottom-btn" id="addUrlBtn">Add URL</button>
+            <button class="bottom-btn" id="uploadFilesBtn">Upload Files</button>
+            <button class="bottom-btn" id="shuffleBtn">Shuffle</button>
+            <button class="bottom-btn" id="repeatBtn">Repeat</button>
+            <button class="bottom-btn" id="clearPlaylistBtn">Clear</button>
+        </footer>
+    </div>
+
+    <!-- File scanner overlay -->
+    <div class="scanner-overlay hidden" id="scannerOverlay">
+        <div class="scanner-container">
+            <h2 class="scanner-title">Add Media Source</h2>
+            <div class="scanner-status" id="scannerStatus">Enter URL to scan for media files</div>
+            <div class="scanner-progress">
+                <div class="scanner-progress-bar" id="scannerProgress"></div>
+            </div>
+            <label for="fileInput" class="file-input-label">
+                Select Local Files
+            </label>
+            <input type="file" id="fileInput" multiple accept="audio/*,video/*,.pdf,.txt,.epub,.mobi">
+            <div class="manual-scan">
+                <input type="text" class="path-input" id="pathInput" placeholder="Enter URL to scan (e.g., http://example.com/media/)">
+                <button class="scan-btn" id="scanBtn">Scan</button>
+            </div>
+            <button class="scan-btn" id="closeScanner" style="margin-top: 10px; width: 100%;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Audio element -->
+    <audio id="audioPlayer" preload="auto" crossorigin="anonymous"></audio>
+
+    <script>
+        // Global variables
+        let playlist = [];
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+        let isShuffled = false;
+        let repeatMode = 'off';
+
+        // DOM elements
+        const audioPlayer = document.getElementById('audioPlayer');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoElement = document.getElementById('videoElement');
+        const bookReader = document.getElementById('bookReader');
+        const bookTitle = document.getElementById('bookTitle');
+        const bookContent = document.getElementById('bookContent');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progress = document.getElementById('progress');
+        const currentTimeSpan = document.getElementById('currentTime');
+        const durationSpan = document.getElementById('duration');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const playlistContainer = document.getElementById('playlistContainer');
+        const trackCount = document.getElementById('trackCount');
+        const playerStatus = document.getElementById('playerStatus');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const scannerOverlay = document.getElementById('scannerOverlay');
+        const scannerStatus = document.getElementById('scannerStatus');
+        const scannerProgress = document.getElementById('scannerProgress');
+        const fileInput = document.getElementById('fileInput');
+        const pathInput = document.getElementById('pathInput');
+        const scanBtn = document.getElementById('scanBtn');
+        const closeScanner = document.getElementById('closeScanner');
+        
+        // Browser elements
+        const urlInput = document.getElementById('urlInput');
+        const goBtn = document.getElementById('goBtn');
+        const scanUrlBtn = document.getElementById('scanUrlBtn');
+        const webBrowser = document.getElementById('webBrowser');
+        const mediaPlayer = document.getElementById('mediaPlayer');
+        const mediaTitle = document.getElementById('mediaTitle');
+        const mediaPlayPause = document.getElementById('mediaPlayPause');
+        const mediaPrev = document.getElementById('mediaPrev');
+        const mediaNext = document.getElementById('mediaNext');
+        const mediaProgress = document.getElementById('mediaProgress');
+        const mediaProgressBar = document.getElementById('mediaProgressBar');
+        const closeMedia = document.getElementById('closeMedia');
+
+        // File type detection
+        const fileTypes = {
+            audio: ['mp3', 'wav', 'ogg', 'm4a', 'aac', 'flac', 'wma'],
+            video: ['mp4', 'webm', 'avi', 'mov', 'mkv', 'wmv', 'flv'],
+            book: ['pdf', 'txt', 'epub', 'mobi', 'doc', 'docx']
+        };
+
+        // Initialize cyber background
+        function createCyberBackground() {
+            const cyberBg = document.getElementById('cyberBg');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                cyberBg.appendChild(particle);
+            }
+        }
+
+        // Detect file type from extension
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            for (const [type, extensions] of Object.entries(fileTypes)) {
+                if (extensions.includes(ext)) {
+                    return type;
+                }
+            }
+            return 'other';
+        }
+
+        // Improved directory listing parser
+        async function parseDirectoryListing(url) {
+            try {
+                // Try to fetch with CORS proxy to avoid CORS issues
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxyUrl + url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const text = await response.text();
+                const files = [];
+                
+                // Create a temporary DOM parser
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                
+                // Look for links in the page
+                const links = doc.querySelectorAll('a');
+                
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    const text = link.textContent.trim();
+                    
+                    if (!href || href === '../' || href === '/') return;
+                    
+                    // Check if it's a file with supported extension
+                    const fileType = getFileType(href);
+                    if (fileType !== 'other') {
+                        // Create absolute URL
+                        const absoluteUrl = new URL(href, url).href;
+                        files.push({
+                            name: text || href,
+                            url: absoluteUrl,
+                            type: fileType,
+                            extension: href.split('.').pop().toLowerCase()
+                        });
+                    }
+                });
+                
+                return files;
+            } catch (error) {
+                console.error('Error parsing directory:', error);
+                // Fallback: try direct fetch without proxy
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    const text = await response.text();
+                    const files = [];
+                    
+                    // Simple regex to find MP3 files in directory listing
+                    const mp3Regex = /href="([^"]*\.(mp3|wav|ogg|m4a|aac|flac|mp4|webm|avi|mov|mkv|pdf|txt|epub))"/gi;
+                    let match;
+                    
+                    while ((match = mp3Regex.exec(text)) !== null) {
+                        const fileUrl = match[1];
+                        if (fileUrl && !fileUrl.includes('/../')) {
+                            const fileType = getFileType(fileUrl);
+                            if (fileType !== 'other') {
+                                const absoluteUrl = new URL(fileUrl, url).href;
+                                files.push({
+                                    name: fileUrl.split('/').pop(),
+                                    url: absoluteUrl,
+                                    type: fileType,
+                                    extension: fileUrl.split('.').pop().toLowerCase()
+                                });
+                            }
+                        }
+                    }
+                    
+                    return files;
+                } catch (fallbackError) {
+                    console.error('Fallback parsing also failed:', fallbackError);
+                    showNotification('Error', 'Failed to scan directory. CORS issue detected.', 'error');
+                    return [];
+                }
+            }
+        }
+
+        // Scan URL for media files
+        async function scanUrlForMedia(url) {
+            try {
+                updateScannerStatus('Scanning URL for media files...', 25);
+                
+                // Scan the URL
+                const files = await parseDirectoryListing(url);
+                
+                updateScannerStatus(`Found ${files.length} media files`, 75);
+                
+                // Add files to playlist
+                let addedCount = 0;
+                files.forEach(file => {
+                    const existingIndex = playlist.findIndex(item => item.url === file.url);
+                    if (existingIndex === -1) {
+                        playlist.push(file);
+                        addedCount++;
+                    }
+                });
+                
+                updateScannerStatus('Adding files to playlist...', 90);
+                
+                createPlaylistUI();
+                updateTrackCount();
+                updateScannerStatus('Scan complete!', 100);
+                
+                setTimeout(() => {
+                    scannerOverlay.classList.add('hidden');
+                    showNotification('Success', `Added ${addedCount} files to playlist`, 'success');
+                }, 1000);
+                
+                return true;
+            } catch (error) {
+                updateScannerStatus(`Scan failed: ${error.message}`, 0);
+                console.error('Scan error:', error);
+                showNotification('Error', 'Failed to scan URL. Check console for details.', 'error');
+                return false;
+            }
+        }
+
+        // Update scanner status
+        function updateScannerStatus(message, progress) {
+            scannerStatus.textContent = message;
+            scannerProgress.style.width = progress + '%';
+        }
+
+        // Create playlist UI - Afficher TOUS les fichiers avec scrollbar
+        function createPlaylistUI() {
+            playlistContainer.innerHTML = '';
+            
+            if (playlist.length === 0) {
+                playlistContainer.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">No files in playlist</div>';
+                return;
+            }
+            
+            // Afficher TOUS les éléments de la playlist
+            playlist.forEach((item, index) => {
+                const playlistItem = document.createElement('div');
+                playlistItem.className = 'playlist-item';
+                if (index === currentTrackIndex) {
+                    playlistItem.classList.add('active');
+                }
+                
+                // Déterminer l'icône selon le type de fichier
+                let icon = '📄';
+                if (item.type === 'audio') icon = '🎵';
+                if (item.type === 'video') icon = '🎬';
+                if (item.type === 'book') icon = '📖';
+                
+                // Tronquer le nom si trop long
+                let displayName = item.name;
+                if (displayName.length > 40) {
+                    displayName = displayName.substring(0, 37) + '...';
+                }
+                
+                playlistItem.innerHTML = `
+                    <div class="track-info">
+                        <div class="track-header">
+                            <div class="track-name-wrapper">
+                                <div class="track-name" title="${item.name}">${icon} ${displayName}</div>
+                            </div>
+                            <div class="track-type">${item.type.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div class="track-actions">
+                        <button class="download-btn" data-index="${index}">Download</button>
+                    </div>
+                `;
+                
+                playlistItem.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('download-btn')) {
+                        loadMedia(index);
+                        if (!isPlaying && item.type === 'audio') {
+                            togglePlayPause();
+                        }
+                    }
+                });
+                
+                playlistContainer.appendChild(playlistItem);
+            });
+            
+            // Add download event listeners
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const index = parseInt(btn.dataset.index);
+                    downloadFile(index);
+                });
+            });
+        }
+
+        // Load media file
+        function loadMedia(index) {
+            if (index >= 0 && index < playlist.length) {
+                currentTrackIndex = index;
+                const item = playlist[index];
+                
+                // Hide all players first
+                mediaPlayer.classList.remove('active');
+                videoPlayer.classList.remove('active');
+                bookReader.classList.remove('active');
+                
+                // Update active state in playlist
+                document.querySelectorAll('.playlist-item').forEach((playlistItem, i) => {
+                    if (i === index) {
+                        playlistItem.classList.add('active');
+                    } else {
+                        playlistItem.classList.remove('active');
+                    }
+                });
+                
+                // Load based on file type
+                switch(item.type) {
+                    case 'audio':
+                        audioPlayer.src = item.url;
+                        mediaTitle.textContent = item.name;
+                        mediaPlayer.classList.add('active');
+                        playerStatus.textContent = 'Audio Loaded';
+                        break;
+                        
+                    case 'video':
+                        videoElement.src = item.url;
+                        videoPlayer.classList.add('active');
+                        playerStatus.textContent = 'Video Loaded';
+                        break;
+                        
+                    case 'book':
+                        loadBook(item);
+                        bookReader.classList.add('active');
+                        playerStatus.textContent = 'Book Loaded';
+                        break;
+                }
+                
+                // If already playing and it's audio, start playback
+                if (isPlaying && item.type === 'audio') {
+                    audioPlayer.play().catch(e => {
+                        console.error('Playback error:', e);
+                    });
+                }
+            }
+        }
+
+        // Load book content
+        async function loadBook(book) {
+            bookTitle.textContent = book.name;
+            bookContent.innerHTML = '<p>Loading book content...</p>';
+            
+            try {
+                // Use CORS proxy for books too
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxyUrl + book.url);
+                if (!response.ok) throw new Error('Failed to load book');
+                
+                if (book.extension === 'txt') {
+                    const text = await response.text();
+                    bookContent.innerHTML = `<pre>${text}</pre>`;
+                } else if (book.extension === 'pdf') {
+                    // For PDF, we'll display a message and offer download
+                    bookContent.innerHTML = `
+                        <p>PDF files cannot be displayed directly in the browser.</p>
+                        <p>Please download the file to view it.</p>
+                        <button class="download-btn" onclick="downloadFile(${playlist.indexOf(book)})" style="margin-top: 10px;">
+                            Download PDF
+                        </button>
+                    `;
+                } else {
+                    bookContent.innerHTML = `<p>This book format (${book.extension}) is not supported for direct reading.</p>`;
+                }
+            } catch (error) {
+                bookContent.innerHTML = `<p>Error loading book: ${error.message}</p>`;
+            }
+        }
+
+        // Toggle play/pause
+        function togglePlayPause() {
+            const currentItem = playlist[currentTrackIndex];
+            if (!currentItem) return;
+            
+            if (currentItem.type === 'audio') {
+                if (isPlaying) {
+                    audioPlayer.pause();
+                    playPauseBtn.textContent = '▶';
+                    playerStatus.textContent = 'Paused';
+                } else {
+                    audioPlayer.play().then(() => {
+                        playPauseBtn.textContent = '⏸';
+                        playerStatus.textContent = 'Playing';
+                    }).catch(e => {
+                        console.error('Playback error:', e);
+                        showNotification('Error', 'Failed to play audio: ' + e.message, 'error');
+                    });
+                }
+                isPlaying = !isPlaying;
+            } else if (currentItem.type === 'video') {
+                if (videoElement.paused) {
+                    videoElement.play();
+                    playerStatus.textContent = 'Playing Video';
+                } else {
+                    videoElement.pause();
+                    playerStatus.textContent = 'Paused Video';
+                }
+            }
+        }
+
+        // Play next media
+        function playNext() {
+            if (playlist.length === 0) return;
+            
+            let nextIndex;
+            if (isShuffled) {
+                nextIndex = Math.floor(Math.random() * playlist.length);
+            } else {
+                nextIndex = (currentTrackIndex + 1) % playlist.length;
+            }
+            
+            loadMedia(nextIndex);
+            
+            const nextItem = playlist[nextIndex];
+            if (isPlaying && nextItem.type === 'audio') {
+                audioPlayer.play();
+            }
+        }
+
+        // Play previous media
+        function playPrev() {
+            if (playlist.length === 0) return;
+            
+            let prevIndex;
+            if (isShuffled) {
+                prevIndex = Math.floor(Math.random() * playlist.length);
+            } else {
+                prevIndex = currentTrackIndex - 1;
+                if (prevIndex < 0) prevIndex = playlist.length - 1;
+            }
+            
+            loadMedia(prevIndex);
+            
+            const prevItem = playlist[prevIndex];
+            if (isPlaying && prevItem.type === 'audio') {
+                audioPlayer.play();
+            }
+        }
+
+        // Download file
+        function downloadFile(index) {
+            if (index >= 0 && index < playlist.length) {
+                const item = playlist[index];
+                const link = document.createElement('a');
+                link.href = item.url;
+                link.download = item.name;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showNotification('Download Started', `Downloading ${item.name}`, 'success');
+            }
+        }
+
+        // Download all files
+        function downloadAllFiles() {
+            if (playlist.length === 0) {
+                showNotification('Error', 'No files to download', 'error');
+                return;
+            }
+            
+            showNotification('Download Started', `Downloading ${playlist.length} files...`, 'success');
+            
+            for (let i = 0; i < playlist.length; i++) {
+                setTimeout(() => {
+                    downloadFile(i);
+                }, i * 500);
+            }
+        }
+
+        // Update track count
+        function updateTrackCount() {
+            trackCount.textContent = `${playlist.length} Files`;
+        }
+
+        // Format time
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Show notification
+        function showNotification(title, message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Shuffle playlist
+        function shufflePlaylist() {
+            if (playlist.length === 0) {
+                showNotification('Error', 'No files to shuffle', 'error');
+                return;
+            }
+            
+            if (isShuffled) {
+                // Reset to original order
+                isShuffled = false;
+                showNotification('Shuffle Off', 'Playlist restored to original order', 'success');
+            } else {
+                // Shuffle the playlist
+                for (let i = playlist.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+                }
+                isShuffled = true;
+                showNotification('Shuffle On', 'Playlist shuffled', 'success');
+            }
+            createPlaylistUI();
+        }
+
+        // Toggle repeat mode
+        function toggleRepeat() {
+            const modes = ['off', 'all', 'one'];
+            const currentIndex = modes.indexOf(repeatMode);
+            repeatMode = modes[(currentIndex + 1) % modes.length];
+            
+            const messages = {
+                'off': 'Repeat Off',
+                'all': 'Repeat All',
+                'one': 'Repeat One'
+            };
+            
+            showNotification('Repeat Mode', messages[repeatMode], 'success');
+        }
+
+        // Navigate to URL in browser
+        function navigateToUrl(url) {
+            if (!url) return;
+            
+            // Add http:// if no protocol specified
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            
+            try {
+                webBrowser.src = url;
+                urlInput.value = url;
+                showNotification('Browser', `Loading ${url}`, 'success');
+            } catch (error) {
+                showNotification('Error', 'Invalid URL', 'error');
+            }
+        }
+
+        // Event listeners
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        prevBtn.addEventListener('click', playPrev);
+        nextBtn.addEventListener('click', playNext);
+        downloadAllBtn.addEventListener('click', downloadAllFiles);
+
+        // Progress bar for audio
+        progressBar.addEventListener('click', (e) => {
+            if (audioPlayer.duration) {
+                const rect = progressBar.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                audioPlayer.currentTime = percent * audioPlayer.duration;
+            }
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            audioPlayer.volume = volume / 100;
+            videoElement.volume = volume / 100;
+            volumeValue.textContent = volume + '%';
+        });
+
+        // Audio events
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (audioPlayer.duration) {
+                const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                progress.style.width = percent + '%';
+                currentTimeSpan.textContent = formatTime(audioPlayer.currentTime);
+                durationSpan.textContent = formatTime(audioPlayer.duration);
+            }
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            if (repeatMode === 'one') {
+                audioPlayer.currentTime = 0;
+                audioPlayer.play();
+            } else if (repeatMode === 'all' || currentTrackIndex < playlist.length - 1) {
+                playNext();
+            } else {
+                isPlaying = false;
+                playPauseBtn.textContent = '▶';
+                playerStatus.textContent = 'Stopped';
+            }
+        });
+
+        // Video events
+        videoElement.addEventListener('timeupdate', () => {
+            if (videoElement.duration) {
+                const percent = (videoElement.currentTime / videoElement.duration) * 100;
+                mediaProgressBar.style.width = percent + '%';
+            }
+        });
+
+        // File input
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                files.forEach(file => {
+                    const fileType = getFileType(file.name);
+                    if (fileType !== 'other') {
+                        playlist.push({
+                            name: file.name,
+                            url: URL.createObjectURL(file),
+                            type: fileType,
+                            extension: file.name.split('.').pop(),
+                            isLocal: true
+                        });
+                    }
+                });
+                
+                createPlaylistUI();
+                updateTrackCount();
+                scannerOverlay.classList.add('hidden');
+                showNotification('Success', `Added ${files.length} files to playlist`, 'success');
+            }
+        });
+
+        // Manual scan
+        scanBtn.addEventListener('click', async () => {
+            const url = pathInput.value.trim();
+            if (url) {
+                await scanUrlForMedia(url);
+            } else {
+                showNotification('Error', 'Please enter a URL to scan', 'error');
+            }
+        });
+
+        // Browser navigation
+        goBtn.addEventListener('click', () => {
+            navigateToUrl(urlInput.value);
+        });
+
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                navigateToUrl(urlInput.value);
+            }
+        });
+
+        // Scan current URL
+        scanUrlBtn.addEventListener('click', () => {
+            const currentUrl = webBrowser.src;
+            if (currentUrl && currentUrl !== 'about:blank') {
+                pathInput.value = currentUrl;
+                scannerOverlay.classList.remove('hidden');
+                showNotification('Info', 'URL copied to scanner', 'success');
+            } else {
+                showNotification('Error', 'No URL loaded in browser', 'error');
+            }
+        });
+
+        // Media player controls
+        mediaPlayPause.addEventListener('click', togglePlayPause);
+        closeMedia.addEventListener('click', () => {
+            mediaPlayer.classList.remove('active');
+            videoPlayer.classList.remove('active');
+            bookReader.classList.remove('active');
+        });
+
+        // Bottom controls
+        document.getElementById('addUrlBtn').addEventListener('click', () => {
+            scannerOverlay.classList.remove('hidden');
+        });
+
+        document.getElementById('uploadFilesBtn').addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        document.getElementById('shuffleBtn').addEventListener('click', shufflePlaylist);
+        document.getElementById('repeatBtn').addEventListener('click', toggleRepeat);
+
+        document.getElementById('clearPlaylistBtn').addEventListener('click', () => {
+            playlist = [];
+            createPlaylistUI();
+            updateTrackCount();
+            showNotification('Playlist Cleared', 'All files removed from playlist', 'success');
+        });
+
+        document.getElementById('toggleVideo').addEventListener('click', () => {
+            videoPlayer.classList.toggle('active');
+        });
+
+        document.getElementById('toggleBook').addEventListener('click', () => {
+            bookReader.classList.toggle('active');
+        });
+
+        // Scanner controls
+        closeScanner.addEventListener('click', () => {
+            scannerOverlay.classList.add('hidden');
+        });
+
+        // Initialize
+        createCyberBackground();
+
+        // Set default browser page
+        webBrowser.src = 'https://www.google.com';
+        urlInput.value = 'https://www.google.com';
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const activeElement = document.activeElement;
+            const isInputFocused = activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA';
+            
+            // Ne pas capturer les touches si l'utilisateur est en train de taper dans un champ
+            if (isInputFocused) {
+                // Permettre l'utilisation des flèches dans les champs de texte
+                if (e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+                    return;
+                }
+                // Pour tous les autres cas, ne pas interférer avec la saisie
+                return;
+            }
+            
+            // Raccourcis globaux uniquement si aucun champ n'est focus
+            switch(e.code) {
+                case 'Space':
+                    e.preventDefault();
+                    togglePlayPause();
+                    break;
+                case 'ArrowLeft':
+                    playPrev();
+                    break;
+                case 'ArrowRight':
+                    playNext();
+                    break;
+                case 'ArrowUp':
+                    volumeSlider.value = Math.min(100, parseInt(volumeSlider.value) + 5);
+                    volumeSlider.dispatchEvent(new Event('input'));
+                    break;
+                case 'ArrowDown':
+                    volumeSlider.value = Math.max(0, parseInt(volumeSlider.value) - 5);
+                    volumeSlider.dispatchEvent(new Event('input'));
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
