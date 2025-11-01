@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BEATSTREET CYBERDASH - Multimedia System</title>
+    <!-- Ajout de la bibliothèque JSZip pour créer des fichiers ZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
         
@@ -966,6 +968,69 @@
             font-size: clamp(10px, 2vw, 12px);
         }
 
+        /* Progress overlay for ZIP creation */
+        .zip-progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 8, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .zip-progress-container {
+            background: var(--bg-panel);
+            border: 2px solid var(--primary-cyan);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--glow-cyan);
+        }
+
+        .zip-progress-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--primary-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .zip-progress-status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: clamp(12px, 2.5vw, 14px);
+            color: var(--text-secondary);
+        }
+
+        .zip-progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .zip-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-cyan), var(--accent-blue));
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: var(--glow-cyan);
+        }
+
         /* Responsive design */
         @media (max-width: 1024px) {
             .main-content {
@@ -1054,7 +1119,7 @@
                     </div>
                 </div>
                 <button class="download-all-btn" id="downloadAllBtn">
-                    Download All Files
+                    Download All as ZIP
                 </button>
             </section>
 
@@ -1176,6 +1241,20 @@
         </div>
     </div>
 
+    <!-- ZIP Progress Overlay -->
+    <div class="zip-progress-overlay" id="zipProgressOverlay">
+        <div class="zip-progress-container">
+            <h2 class="zip-progress-title">Creating ZIP Archive</h2>
+            <div class="zip-progress-status" id="zipProgressStatus">Preparing files...</div>
+            <div class="zip-progress-bar-container">
+                <div class="zip-progress-bar" id="zipProgressBar"></div>
+            </div>
+            <div id="zipProgressDetails" style="text-align: center; font-size: clamp(10px, 2vw, 12px); color: var(--text-secondary);">
+                Processing: <span id="zipCurrentFile">0</span> / <span id="zipTotalFiles">0</span> files
+            </div>
+        </div>
+    </div>
+
     <!-- Audio element -->
     <audio id="audioPlayer" preload="auto" crossorigin="anonymous"></audio>
 
@@ -1214,6 +1293,13 @@
         const pathInput = document.getElementById('pathInput');
         const scanBtn = document.getElementById('scanBtn');
         const closeScanner = document.getElementById('closeScanner');
+        
+        // ZIP Progress elements
+        const zipProgressOverlay = document.getElementById('zipProgressOverlay');
+        const zipProgressStatus = document.getElementById('zipProgressStatus');
+        const zipProgressBar = document.getElementById('zipProgressBar');
+        const zipCurrentFile = document.getElementById('zipCurrentFile');
+        const zipTotalFiles = document.getElementById('zipTotalFiles');
         
         // Browser elements
         const urlInput = document.getElementById('urlInput');
@@ -1622,19 +1708,71 @@
             }
         }
 
-        // Download all files
-        function downloadAllFiles() {
+        // Download all files as ZIP
+        async function downloadAllFiles() {
             if (playlist.length === 0) {
                 showNotification('Error', 'No files to download', 'error');
                 return;
             }
             
-            showNotification('Download Started', `Downloading ${playlist.length} files...`, 'success');
+            // Show progress overlay
+            zipProgressOverlay.style.display = 'flex';
+            zipTotalFiles.textContent = playlist.length;
+            zipCurrentFile.textContent = '0';
+            zipProgressBar.style.width = '0%';
             
-            for (let i = 0; i < playlist.length; i++) {
+            try {
+                // Create a new ZIP file
+                const zip = new JSZip();
+                
+                // Process each file
+                for (let i = 0; i < playlist.length; i++) {
+                    const item = playlist[i];
+                    
+                    // Update progress
+                    zipCurrentFile.textContent = i + 1;
+                    const progressPercent = ((i + 1) / playlist.length) * 100;
+                    zipProgressBar.style.width = progressPercent + '%';
+                    zipProgressStatus.textContent = `Processing ${item.name}...`;
+                    
+                    try {
+                        // Fetch the file
+                        const response = await fetch(item.url);
+                        if (!response.ok) throw new Error(`Failed to fetch ${item.name}`);
+                        
+                        // Get the file data as a blob
+                        const blob = await response.blob();
+                        
+                        // Add the file to the ZIP
+                        zip.file(item.name, blob);
+                    } catch (error) {
+                        console.error(`Error adding ${item.name} to ZIP:`, error);
+                        // Continue with other files even if one fails
+                    }
+                }
+                
+                // Generate the ZIP file
+                zipProgressStatus.textContent = 'Creating ZIP archive...';
+                const zipBlob = await zip.generateAsync({type: 'blob'});
+                
+                // Create a download link for the ZIP file
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(zipBlob);
+                link.download = 'Beatstreet_Cyberdash_Playlist.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Hide progress overlay
                 setTimeout(() => {
-                    downloadFile(i);
-                }, i * 500);
+                    zipProgressOverlay.style.display = 'none';
+                    showNotification('Success', 'Playlist downloaded as ZIP file', 'success');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error creating ZIP:', error);
+                zipProgressOverlay.style.display = 'none';
+                showNotification('Error', 'Failed to create ZIP file: ' + error.message, 'error');
             }
         }
 
