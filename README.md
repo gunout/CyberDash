@@ -8,6 +8,10 @@ Beatstreet Cyberdash - Lecteur de fichiers - ( http:// )
 # RECOMMANDATIONS 
     PS : UTILISER L'EXTENSIONS ( ADD-ONS ) WEBROWSER - FEARCH POUR TROUVER DES LIENS : http:// 
 
+# EXAMPLE DE LIENS ( HTTP SERVER ) :
+
+    https://www.ashleecadell.com/xyzstorelibrary/
+
 # LIENS - FEARCH :
 https://addons.mozilla.org/en-US/firefox/addon/fearchit/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search
 
